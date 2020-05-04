@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createComponent } from './componet';
 
-import TestComponent from './TestComponent';
+import FirstView from './FirstView';
 
 
-const TestComponentInstance = createComponent(TestComponent);
+const FirstViewInstance = createComponent(FirstView);
 
 // react
-ReactDOM.render(<TestComponentInstance />, document.getElementById('entry-dom-element'));
+ReactDOM.render(<FirstViewInstance />, document.getElementById('entry-dom-element'));
