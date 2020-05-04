@@ -1,14 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createComponent } from './componet';
 
 import TestComponent from './TestComponent';
 
 
-const TestComponentInstance = (props: any): JSX.Element => {
-    const [data, setData] = React.useState(() => TestComponent.data());
-
-    return <TestComponent.view {...{ data, setData }} />
-};
+const TestComponentInstance = createComponent(TestComponent);
 
 // react
 ReactDOM.render(<TestComponentInstance />, document.getElementById('entry-dom-element'));
