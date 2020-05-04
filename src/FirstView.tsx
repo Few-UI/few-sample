@@ -6,7 +6,7 @@ import {
     ComponentDefinition,
     ObjectLiteral,
     ViewTemplate
-} from './componet';
+} from './types';
 
 
 const Instance: ComponentDefinition = {
