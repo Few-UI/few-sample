@@ -1,7 +1,19 @@
 /* eslint-env es6 */
+// https://github.com/typescript-cheatsheets/react-typescript-cheatsheet
 
 import React from 'react';
 
-// https://github.com/typescript-cheatsheets/react-typescript-cheatsheet
-const TestComponent = ({ value }: { value: string }): JSX.Element => <h4>Hello {value}</h4>;
+interface ObjectLiteral {
+    [key: string]: ObjectLiteral;
+}
+
+const TestComponent: any = {
+    view: ({ data }: { data: ObjectLiteral }): JSX.Element => <h4>Hello {data.name}</h4>,
+    viewmodel: {
+        data: {
+            name: "React"
+        }
+    }
+};
+
 export default TestComponent;
