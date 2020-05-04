@@ -2,6 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import serve from 'rollup-plugin-serve';
 import typescript from 'rollup-plugin-typescript';
+import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 
 // `npm run build` -> `production` is true
@@ -16,6 +17,10 @@ export default {
 		sourcemap: true
 	},
 	plugins: [
+		// https://github.com/rollup/rollup/issues/487
+	    replace({
+  	        'process.env.NODE_ENV': JSON.stringify( production ? 'production' : 'development' )
+	    }),
 		typescript(),
 		resolve(), // tells Rollup how to find date-fns in node_modules
 		commonjs(), // converts date-fns to ES modules
