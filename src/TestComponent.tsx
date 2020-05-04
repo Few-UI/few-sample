@@ -2,17 +2,15 @@
 // https://github.com/typescript-cheatsheets/react-typescript-cheatsheet
 
 import React from 'react';
+import { ComponentDefinition, ObjectLiteral } from './componet';
 
-interface ObjectLiteral {
-    [key: string]: ObjectLiteral | string | number | boolean | Array<any>;
-}
 
-const TestComponent: any = {
+const Instance: ComponentDefinition = {
     view: ({ data, setData }: { data: ObjectLiteral, setData: Function }): JSX.Element => (
         <div>
             <h4>Hello {data.name}</h4>
             <div>{data.value}</div>
-            <button onClick={() => TestComponent.actions.plusOne(data.value, 'value', data, setData)}>+1</button>
+            <button onClick={() => Instance.actions.plusOne(data.value, 'value', data, setData)}>+1</button>
         </div>
     ),
     data: (): ObjectLiteral => ({
@@ -30,4 +28,4 @@ const TestComponent: any = {
     }
 };
 
-export default TestComponent;
+export default Instance;

@@ -1,12 +1,24 @@
 
 import React from 'react';
 
-interface HighOrderFunc {
-    (componentDef: any): JSX.Element;
+export interface ObjectLiteral {
+    [key: string]: ObjectLiteral | string | number | boolean | Array<any>;
 }
 
-export const createComponent = (componentDef: any): HighOrderFunc =>
-    (props: React.PropsWithChildren<{}>): JSX.Element => {
-        const [data, setData] = React.useState(() => componentDef.data());
-        return React.createElement(componentDef.view, { data, setData });
+export interface ComponentDefinition {
+    view: { ({ data, setData }: { data: ObjectLiteral, setData: Function }): JSX.Element },
+    data: { (): ObjectLiteral },
+    actions: {
+        [key: string]: Function
     }
+}
+
+export interface ComponentFactory {
+    (componentDef: ComponentDefinition): { (props: React.PropsWithChildren<{}>): JSX.Element };
+}
+
+
+export const createComponent: ComponentFactory = componentDef => props => {
+    const [data, setData] = React.useState(() => componentDef.data());
+    return React.createElement(componentDef.view, { data, setData });
+}
