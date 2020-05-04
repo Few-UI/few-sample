@@ -5,8 +5,12 @@ export interface ObjectLiteral {
     [key: string]: ObjectLiteral | string | number | boolean | Array<any>;
 }
 
+export interface ViewTemplate {
+    ({ data, setData }: { data: ObjectLiteral, setData: Function }): JSX.Element
+}
+
 export interface ComponentDefinition {
-    view: { ({ data, setData }: { data: ObjectLiteral, setData: Function }): JSX.Element },
+    view: ViewTemplate,
     data: { (): ObjectLiteral },
     actions: {
         [key: string]: Function
