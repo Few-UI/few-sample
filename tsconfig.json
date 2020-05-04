@@ -3,10 +3,12 @@
         "outDir": "./public",
         "allowJs": true,
         "esModuleInterop": true,
-        "target": "es5"
+        "target": "es5",
+        "jsx": "react",
+        "sourceMap": true
     },
     "include": [
         "./src/**/*"
     ],
-    "exclude": ["node_modules"]
+    "exclude": [ "node_modules" ]
 }

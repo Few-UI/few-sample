@@ -10,25 +10,25 @@ import { terser } from 'rollup-plugin-terser';
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-	input: 'src/main.ts',
-	output: {
-		file: 'public/bundle.js',
-		format: 'iife', // immediately-invoked function expression — suitable for <script> tags
-		sourcemap: true
-	},
-	plugins: [
-		// https://github.com/rollup/rollup/issues/487
-	    replace({
-  	        'process.env.NODE_ENV': JSON.stringify( production ? 'production' : 'development' )
-	    }),
-		typescript(),
-		resolve(), // tells Rollup how to find date-fns in node_modules
-		commonjs(), // converts date-fns to ES modules
+    input: 'src/main.tsx',
+    output: {
+        file: 'public/bundle.js',
+        format: 'iife', // immediately-invoked function expression — suitable for <script> tags
+        sourcemap: true
+    },
+    plugins: [
+        // https://github.com/rollup/rollup/issues/487
+        replace( {
+            'process.env.NODE_ENV': JSON.stringify( production ? 'production' : 'development' )
+        } ),
+        typescript(),
+        resolve(), // tells Rollup how to find date-fns in node_modules
+        commonjs(), // converts date-fns to ES modules
         production && terser(), // minify, but only in production
-        !production && serve({
+        !production && serve( {
             contentBase: 'public',
             host: '0.0.0.0',
             port: 8080
-        })
-	]
+        } )
+    ]
 };

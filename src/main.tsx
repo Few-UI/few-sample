@@ -10,6 +10,6 @@ console.log('if you have sourcemaps enabled in your devtools, click on main.js:5
 const elem = document.getElementById('react-entry');
 
 
-ReactDOM.render( React.createElement('h4', null, 'Hello React'), elem );
+ReactDOM.render(<h4>Hello React</h4>, elem);
 
 update();
