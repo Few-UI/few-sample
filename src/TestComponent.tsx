@@ -1,3 +1,4 @@
-import React from 'react';
+import React, { Component, ReactComponentElement } from 'react';
 
-export default () => <h4>Hello React</h4>;
+// https://github.com/typescript-cheatsheets/react-typescript-cheatsheet
+export default ({ value }: { value: string }): JSX.Element => <h4>Hello {value}</h4>;

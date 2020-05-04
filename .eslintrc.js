@@ -1,6 +1,5 @@
 // https://eslint.org/docs/rules/
 module.exports = {
-    extends: 'eslint:recommended',
     rules: {
         'array-bracket-spacing': [ 'error', 'always', { 'singleValue': true } ],
         // 'block-scoped-var': 2,
@@ -174,11 +173,21 @@ module.exports = {
         amd: true,
         es6: true
     },
-    parser: "babel-eslint",
+    // https://github.com/typescript-eslint/typescript-eslint/blob/master/docs/getting-started/linting/README.md
+    parser: '@typescript-eslint/parser',
+    plugins: [
+        '@typescript-eslint'
+    ],
+    extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+        'prettier/@typescript-eslint',
+    ],
     parserOptions: {
         ecmaVersion: 2018,
-        sourceType: "module",
-        "allowImportExportEverywhere": true,
+        sourceType: 'module',
+        'allowImportExportEverywhere': true,
         ecmaFeatures: {
             jsx: true,
             impliedStrict: false

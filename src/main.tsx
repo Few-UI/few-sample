@@ -4,4 +4,4 @@ import ReactDOM from 'react-dom';
 import TestComponent from './TestComponent';
 
 // react
-ReactDOM.render(<TestComponent />, document.getElementById('entry-dom-element'));
+ReactDOM.render(<TestComponent value={'React'} />, document.getElementById('entry-dom-element'));
