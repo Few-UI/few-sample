@@ -1,5 +1,20 @@
 {
-    "name": "rollup-starter-app",
+    "name": "few-sample",
+    "version": "1.0.0",
+    "description": "few sample app",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Few-UI/few-sample.git"
+    },
+    "keywords": [
+        "few"
+    ],
+    "author": "jesse23",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Few-UI/few-sample/issues"
+    },
+    "homepage": "https://github.com/Few-UI/few-sample#readme",
     "devDependencies": {
         "@rollup/plugin-commonjs": "^11.1.0",
         "@rollup/plugin-node-resolve": "^7.1.3",
