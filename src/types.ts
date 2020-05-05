@@ -28,6 +28,6 @@ export interface ComponentDefinition {
 }
 
 export interface ComponentFactory {
-    (componentDef: ComponentDefinition): { (props: React.PropsWithChildren<{}>): JSX.Element };
+    (componentDef: ComponentDefinition): React.FunctionComponent;
 }
 
