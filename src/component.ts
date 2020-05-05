@@ -1,9 +1,8 @@
 import {
     Dispatcher,
     ComponentFactory,
-    JsonObject,
     Component,
-    ObjectLiteral
+    DataStore
 } from './types';
 
 import React from 'react';
@@ -21,7 +20,7 @@ import {
  * @param result function return value
  * @returns patch object that patch to scope
  */
-const processOutputData = (output: JsonObject, result: ObjectLiteral): ObjectLiteral => {
+const processOutputData = (output: { [key: string]: string }, result: any): DataStore => {
     if (output) {
         const res = {};
         for (let vmPath in output) {
@@ -88,7 +87,7 @@ export const createComponent: ComponentFactory = componentDef => props => {
         }
     });
 
-    const vm = { data, dispatch, actions: {} };
+    const vm: Component = { data, dispatch, actions: {} };
 
     // actions
     vm.actions = Object.entries(componentDef.actions).reduce((res, [key, value]) => {

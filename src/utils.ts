@@ -2,8 +2,9 @@
 
 import lodashSet from 'lodash/set';
 import {
-    JsonObject,
-    ObjectLiteral,
+    DataDef,
+    DataStore,
+    DataStoreCompound,
     PathContext,
 } from './types';
 
@@ -63,7 +64,7 @@ export const hyphenToCamelCase = (str: string): string => {
  */
 export const evalExpression = (
     expr: string,
-    scope: ObjectLiteral,
+    scope: DataStore,
     ignoreError: boolean = false,
     applyObject: Object = null
 ): any => {
@@ -81,16 +82,7 @@ export const evalExpression = (
     }
 }
 
-/**
- * fastest way to copy a pure JSON object, use on your own risk
- * https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript
- *
- * @param input JSON object as input
- * @returns JSON object
- */
-export const cloneJson = (input: JsonObject): JsonObject => {
-    return input ? JSON.parse(JSON.stringify(input)) : input;
-}
+
 
 /**
  * Parse view string as DOM without interpret it. Browser version
@@ -299,7 +291,7 @@ export const isObject = val => val && !isPrimitive(val) && !isArray(val)
  * @param path path to fetch faom scope
  * @returns value from specific path
  */
-export const getValue = (scope: ObjectLiteral, path: string): ObjectLiteral => {
+export const getValue = (scope: DataStore, path: string): DataStore => {
     // return _.get( scope, expr );
     // TODO: when the scope has .xxx, evalFunction will fail but _.get still success
     return evalExpression(path, scope, true);
@@ -313,7 +305,7 @@ export const getValue = (scope: ObjectLiteral, path: string): ObjectLiteral => {
  * @param value value to specific path
  * @returns true if value is different with orignal (and successfully set).
  */
-export const setValue = (data: ObjectLiteral, path: string, value: any): boolean => {
+export const setValue = (data: DataStore, path: string, value: any): boolean => {
     // do immutable comparison only
     if (getValue(data, path) !== value) {
         lodashSet(data, path, value);
@@ -332,6 +324,36 @@ const parseExpr = (str: string): string => {
     return match ? match[1] : undefined;
 }
 
+/**
+ * fastest way to copy a pure JSON object, use on your own risk
+ * https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript
+ *
+ * @param input JSON object as input
+ * @returns JSON object
+ */
+export const cloneJson = (input: DataDef): DataDef => {
+    return input ? JSON.parse(JSON.stringify(input)) : input;
+}
+
+/**
+ * Evaluate data definition to store in mutable way
+ * @param input data definition as input
+ * @param scope store object
+ * @param level current level in the recursive evaluation
+ */
+const evalDataDefinitionInternal = (input: DataStoreCompound, scope: DataStore, level: number): void => {
+    for (let key in input) {
+        let value = input[key];
+        if (typeof value === 'string') {
+            let template = parseExpr(value);
+            if (template) {
+                input[key] = getValue(scope, template);
+            }
+        } else {
+            evalDataDefinitionInternal(input, scope, level + 1);
+        }
+    }
+}
 
 /**
  * Evaluate from data definition like:
@@ -348,20 +370,13 @@ const parseExpr = (str: string): string => {
  * @param level used for recursive call internally
  * @returns evaluated input object
  */
-export const evalDataDefinition = (input: JsonObject, scope: ObjectLiteral, level: number = 0): ObjectLiteral => {
+export const evalDataDefinition = (input: DataDef, scope: DataStore): DataStore => {
     // Make the method to be immutable at top level
-    let obj = level > 0 ? input : cloneJson(input);
+    const store = cloneJson(input);
 
-    for (let key in obj) {
-        let value = obj[key];
-        if (typeof value === 'string') {
-            let template = parseExpr(value);
-            if (template) {
-                obj[key] = getValue(scope, template);
-            }
-        } else {
-            evalDataDefinition(value, scope, level + 1);
-        }
-    }
-    return obj;
+    evalDataDefinitionInternal(store, scope, 0);
+
+    return store;
 }
+
+
