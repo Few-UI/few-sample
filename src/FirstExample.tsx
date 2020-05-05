@@ -12,7 +12,7 @@ const FirstExample: ComponentDefinition = {
         <div>
             <h4>Hello {data.name}</h4>
             <div>{data.value}</div>
-            <button onClick={() => actions.plusOne()}>+1</button>
+            <button onClick={actions.plusOne}>+1</button>
         </div>
     ),
     data: () => ({
