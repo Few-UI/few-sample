@@ -9,12 +9,12 @@ import {
 } from './types';
 
 
-const Instance: ComponentDefinition = {
-    view: ({ data, setData }) => (
+const FirstExample: ComponentDefinition = {
+    view: ({ data, actions }) => (
         <div>
             <h4>Hello {data.name}</h4>
             <div>{data.value}</div>
-            <button onClick={() => Instance.actions.plusOne(data.value, 'value', data, setData)}>+1</button>
+            <button onClick={() => actions.plusOne()}>+1</button>
         </div>
     ),
     data: () => ({
@@ -22,6 +22,17 @@ const Instance: ComponentDefinition = {
         value: 3
     }),
     actions: {
+        plusOne: {
+            in: {
+                value: '${data.value}'
+            },
+            fn: val => val + 1,
+            out: {
+                'data.value': ''
+            }
+        }
+    },
+    actions2: {
         plusOne: (val: number, path: string, data: any, setData: Function) => {
             const newVal = val + 1;
             setData({
@@ -32,4 +43,4 @@ const Instance: ComponentDefinition = {
     }
 };
 
-export default Instance;
+export default FirstExample;

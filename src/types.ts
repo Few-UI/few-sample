@@ -1,19 +1,20 @@
 import React from 'react';
 
 export interface ObjectLiteral {
-    [key: string]: ObjectLiteral | string | number | boolean | Array<any>;
+    [key: string]: ObjectLiteral | string | number | boolean | Function | Array<any>;
 }
 
 export interface ViewTemplate {
-    ({ data, setData }: { data: ObjectLiteral, setData: Function }): JSX.Element
+    ({ data, actions, dispatch }: { data: ObjectLiteral, actions: ObjectLiteral, dispatch: Function }): JSX.Element
 }
 
 export interface ComponentDefinition {
     view: ViewTemplate,
     data: { (): ObjectLiteral },
     actions: {
-        [key: string]: Function
-    }
+        [key: string]: any
+    },
+    actions2?: any
 }
 
 export interface ComponentFactory {
