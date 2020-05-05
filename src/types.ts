@@ -1,8 +1,28 @@
 import React from 'react';
 
-export interface ObjectLiteral {
-    [key: string]: ObjectLiteral | string | number | boolean | Array<any>;
+/**
+ * https://github.com/SunshowerC/blog/issues/7
+ * https://github.com/microsoft/TypeScript/issues/1897
+ *
+ * we only allow name-value pair for now
+ */
+
+export type Primitive = string | boolean | number | void;
+
+export type Compound<T> = Map<T> | Map<T>[] | T[]
+export interface Map<T> {
+    [key: string]: T | Compound<T>
 }
+
+export type JsonObject = Compound<Primitive>;
+
+export type ObjectLiteral = Compound<Primitive | Function>;
+
+export interface PathContext {
+    scope: string,
+    path: string
+}
+
 
 export interface Action {
     [key: string]: Function

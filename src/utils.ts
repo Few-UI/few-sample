@@ -1,7 +1,11 @@
 /* eslint-env es6 */
 
 import lodashSet from 'lodash/set';
-import { ObjectLiteral } from './types';
+import {
+    JsonObject,
+    ObjectLiteral,
+    PathContext,
+} from './types';
 
 export const BaseIndent = '  ';
 
@@ -84,7 +88,7 @@ export const evalExpression = (
  * @param input JSON object as input
  * @returns JSON object
  */
-export const cloneJson = (input: JSON): JSON => {
+export const cloneJson = (input: JsonObject): JsonObject => {
     return input ? JSON.parse(JSON.stringify(input)) : input;
 }
 
@@ -115,144 +119,44 @@ export const bindTrailingArgs = (fn: Function, ...bound_args: any): Function => 
     };
 }
 
-//////////////////////////////////////////////////////////////
-// data getter / setter
-//////////////////////////////////////////////////////////////
-/**
- * get value from scope
- * @param {object} data scope for evaluation
- * @param {string} path string as path/expression
- * @returns {*} result
- */
-export function getValue(data, path) {
-    // return _.get( scope, expr );
-    return evalExpression(path, data, true);
-}
-
-/**
- * Update data by specific path
- * @param {object} data scope for evaluation
- * @param {string} path path on data
- * @param {*} value value needs to update
- * @returns {boolean} true if
- */
-export function setValue(data, path, value) {
-    // do immutable comparison only
-    if (getValue(data, path) !== value) {
-        lodashSet(data, path, value);
-        return true;
-    }
-    return false;
-}
-
-
-/**
- * Set a set of path value pair to data
- * @param {object} data scope for evaluation
- * @param {object} input data Input like { 'data.myVal': 3 }
- * @returns {boolean} true if model has been updated
- */
-export function set(data, input) {
-    let updated = false;
-    for (var key in input) {
-        updated = setValue(data, key, input[key]) || updated;
-    }
-    return updated;
-}
-
-/**
- * parse expr {{aa.bb}} to get aa.bb
- * @param {string} str input string
- * @returns {string} the expression inside {{}}
- */
-function parseExpr(str) {
-    let match = str.match(/^\${(.*)}$/);
-    return match ? match[1] : undefined;
-}
-
-/**
- * Evaluate from data definition like:
- * {
- *    attr1: {{data.curVal}}
- * }
- * @param {JSON} input data definition
- * @param {JSON} scope scope for evaluation
- * @param {number} level used for recursive call internally
- * @returns {JSON} evaluated input object
- */
-export function evalDataDefinition(input, scope, level = 0) {
-    // Make the method to be immutable at top level
-    let obj = level > 0 ? input : cloneJson(input);
-
-    for (let key in obj) {
-        let value = obj[key];
-        if (typeof value === 'string') {
-            let template = parseExpr(value);
-            if (template) {
-                obj[key] = getValue(scope, template);
-            }
-        } else {
-            evalDataDefinition(obj[key], scope, level + 1);
-        }
-    }
-    return obj;
-}
-
-/**
- * Evaluate vm data definition like:
- * {
- *    attr1: {{data.curVal}}
- * }
- * @param {JSON} input data definition
- * @param {object} vm view model object
- * @returns {JSON} evaluated input object
- */
-export function evalVmDataDefinition(input, vm) {
-    return evalDataDefinition(input, {
-        ...vm.props,
-        ...vm,
-        vm
-    });
-}
-
 /**
  * Polyfill to match dynamic import result back to ES5 supported module
  *
- * @param {Object} obj - function to evaluate after loading the dependencies.
- * @returns {Object} ES5 module object
+ * @param obj - function to evaluate after loading the dependencies.
+ * @returns ES5 module object
  */
-export function interopES6Default(obj) {
+export const interopES6Default = (obj: any): any => {
     return obj && obj.__esModule && obj.default ? obj.default : obj;
 }
-
 
 /**
  * print dom node to string for display purpose
  * TODO:
  * - it may break <pre> tag for now, we can tune it later
  * - For text node with \n it is not handled correctly
- * @param {Node} node DOM Node
- * @param {number} level indention level
- * @returns {string} HTML as String
+ *
+ * @param node DOM Node
+ * @returns HTML as String
  */
-export function printDomNode(node) {
-    return formatNode(node).outerHTML;
+export const printDomNode = (node: Node): string => {
+    return (<Element>formatNode(node)).outerHTML;
 }
 
 /**
  * format dom node with indentoin
  * https://stackoverflow.com/questions/26360414/javascript-how-to-correct-indentation-in-html-string
- * @param {Node} node DOM Node
- * @param {number} level indention level
- * @returns {string} HTML as String
+ *
+ * @param node DOM Node
+ * @param level indention level
+ * @returns element has been beautified
  */
-function formatNode(node, level = 0) {
+const formatNode = (node: Node, level: number = 0): Node => {
     /*
     var indentBefore = new Array( level++ + 1 ).join( '  ' );
         var indentAfter  = new Array( level - 1 ).join( '  ' );
         var textNode;
     */
-    const tmpNode = (level ? node.parentNode : node).cloneNode();
+    const tmpNode = (level ? node.parentNode : node).cloneNode() as Element;
     tmpNode.innerHTML = `\n${BaseIndent.repeat(level + 1)}<div></div>\n${BaseIndent.repeat(level)}`;
     const indentBefore = tmpNode.firstChild;
     const indentAfter = tmpNode.lastChild;
@@ -300,11 +204,12 @@ function formatNode(node, level = 0) {
 }
 
 /**
- * simple http get. PLEASE DON'T use it as promise chain - it will cause issue in angularJS mode
- * @param {string} theUrl url as string
- * @returns {Promise} promise
+ * simple http get.
+ *
+ * @param theUrl url as string
+ * @returns promise with response text
  */
-export function httpGet(theUrl) {
+export const httpGet = (theUrl: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function () {
@@ -323,54 +228,39 @@ export function httpGet(theUrl) {
 }
 
 /**
- * simple http get for JSON specific and fake response data structure.
- * PLEASE DON'T use it as promise chain - it will cause issue in angularJS mode
- * @param {string} theUrl url as string
- * @returns {Promise} promise
- */
-export function httpGetJsonObject(theUrl) {
-    return httpGet(theUrl).then((txt: string) => {
-        return {
-            data: JSON.parse(txt)
-        };
-    });
-}
-
-/**
  *
  * Returns Base URL for the current application
  *
- * @returns {String} Base URL for the current application's root 'document' without any query or location attributes
- *          and (if otherwise valid) with a trailing '/' assured (e.g. 'http://100.100.100.100:8888/awc/').
+ * @returns Base URL for the current application's root 'document' without any query or location attributes
+ *          and (if otherwise valid) with a trailing '/' assured.
  */
-export let getBaseURL = function () {
-    if (!_cachedBaseURL) {
+export const getBaseURL: { (): string, _baseURL?: string } = () => {
+    if (!getBaseURL._baseURL) {
         // strip 'index.html' from end of pathname if present
-        var location = window.location;
+        const location = window.location;
 
-        var pathname = location.pathname;
+        const pathname = location.pathname;
 
         // IE11 on Windows 10 doesn't have 'location.origin' object
         const origin = location.origin || location.protocol + '//' + location.hostname +
             (location.port ? ':' + location.port : '')
 
-        _cachedBaseURL = origin + pathname.substring(0, pathname.lastIndexOf('/') + 1);
+        getBaseURL._baseURL = origin + pathname.substring(0, pathname.lastIndexOf('/') + 1);
     }
 
-    return _cachedBaseURL;
+    return getBaseURL._baseURL;
 };
-var _cachedBaseURL;
 
 /**
  * parse data path to scope + subPatoh
- * @param {string} pathStr path string like 'ctx.a.b'
- * @returns {object} path structure like:
+ * @param pathStr path string like 'data.a.b'
+ * @returns path structure like:
  * {
- *     scope: 'ctx'
+ *     scope: 'data'
  *     path: 'a.b'
  * }
  */
-export function parseDataPath(pathStr) {
+export const parseDataPath = (pathStr: string): PathContext => {
     const match = pathStr.match(/[.[]/);
     if (match) {
         return {
@@ -378,5 +268,100 @@ export function parseDataPath(pathStr) {
             path: pathStr.substr(match[0] === '[' ? match.index : match.index + 1)
         };
     }
-    return { scope: pathStr };
+    return {
+        scope: pathStr,
+        path: undefined
+    };
+}
+
+/**
+ * Check value type is primitive or not
+ * @param val input value
+ * @returns true if input is number or string
+ */
+export const isPrimitive = (val: any): boolean => {
+    const type = typeof val;
+    return type === 'number' || type === 'string' || type === 'boolean';
+}
+
+export const isArray = Array.isArray;
+
+export const isObject = val => val && !isPrimitive(val) && !isArray(val)
+
+//////////////////////////////////////////////////////////////
+// data getter / setter
+//////////////////////////////////////////////////////////////
+
+/**
+ * get value from scope
+ *
+ * @param scope scope for evaluation
+ * @param path path to fetch faom scope
+ * @returns value from specific path
+ */
+export const getValue = (scope: ObjectLiteral, path: string): ObjectLiteral => {
+    // return _.get( scope, expr );
+    // TODO: when the scope has .xxx, evalFunction will fail but _.get still success
+    return evalExpression(path, scope, true);
+}
+
+/**
+ * set value to scope
+ *
+ * @param scope scope for evaluation
+ * @param path path to set to scope
+ * @param value value to specific path
+ * @returns true if value is different with orignal (and successfully set).
+ */
+export const setValue = (data: ObjectLiteral, path: string, value: any): boolean => {
+    // do immutable comparison only
+    if (getValue(data, path) !== value) {
+        lodashSet(data, path, value);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * parse expr ${aa.bb}} to get aa.bb
+ * @param str input string
+ * @returns the expression inside ${}
+ */
+const parseExpr = (str: string): string => {
+    let match = str.match(/^\${(.*)}$/);
+    return match ? match[1] : undefined;
+}
+
+
+/**
+ * Evaluate from data definition like:
+ * {
+ *   attr1: ${data.curVal}
+ * }
+ * to actual value in scope like:
+ * {
+ *   attr1: 3
+ * }
+ *
+ * @param input data definition
+ * @param scope scope for evaluation
+ * @param level used for recursive call internally
+ * @returns evaluated input object
+ */
+export const evalDataDefinition = (input: JsonObject, scope: ObjectLiteral, level: number = 0): ObjectLiteral => {
+    // Make the method to be immutable at top level
+    let obj = level > 0 ? input : cloneJson(input);
+
+    for (let key in obj) {
+        let value = obj[key];
+        if (typeof value === 'string') {
+            let template = parseExpr(value);
+            if (template) {
+                obj[key] = getValue(scope, template);
+            }
+        } else {
+            evalDataDefinition(value, scope, level + 1);
+        }
+    }
+    return obj;
 }
