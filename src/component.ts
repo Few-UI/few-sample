@@ -1,15 +1,15 @@
 import {
     Dispatcher,
-    ComponentFactory
+    ComponentFactory,
+    JsonObject,
+    Component,
+    ObjectLiteral
 } from './types';
 
-import {
-    setValue
-} from './utils';
-
-
 import React from 'react';
+
 import {
+    setValue,
     getValue,
     evalDataDefinition,
     parseDataPath
@@ -17,11 +17,11 @@ import {
 
 /**
  * process output data
- * @param {JSON} output output data definition
- * @param {object} result function result
- * @param {object} vm view model object
+ * @param output output data definition
+ * @param result function return value
+ * @returns patch object that patch to scope
  */
-const processOutputData = (output, result) => {
+const processOutputData = (output: JsonObject, result: ObjectLiteral): ObjectLiteral => {
     if (output) {
         const res = {};
         for (let vmPath in output) {
@@ -39,13 +39,16 @@ const processOutputData = (output, result) => {
  * @param component component instance
  * @returns fuction callback as action
  */
-const createAction = (actionDef, component) => () => {
+const createAction = (actionDef: any, component: Component) => (): void => {
 
     const { dispatch } = component;
 
     let actionFunc = actionDef.fn;
 
-    let input = evalDataDefinition(actionDef.in, component);
+    // https://stackoverflow.com/questions/37006008/typescript-index-signature-is-missing-in-type
+    // - Put component directly has the risk that people can say component.myAttr = newValue.
+    // - {...component} stops it
+    let input = evalDataDefinition(actionDef.in, { ...component });
 
     // TODO: match name with function parameters
     // https://stackoverflow.com/questions/1007981/how-to-get-function-parameter-names-values-dynamically

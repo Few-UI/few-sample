@@ -7,7 +7,7 @@ import React from 'react';
  * we only allow name-value pair for now
  */
 
-export type Primitive = string | boolean | number | void;
+export type Primitive = void | boolean | number | string;
 
 export type Compound<T> = Map<T> | Map<T>[] | T[]
 export interface Map<T> {
