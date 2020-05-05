@@ -1,6 +1,7 @@
 /* eslint-env es6 */
 
 import lodashSet from 'lodash/set';
+import { ObjectLiteral } from './types';
 
 export const BaseIndent = '  ';
 
@@ -16,55 +17,60 @@ export const Node = {
     DOCUMENT_FRAGMENT_NODE: 11
 };
 
-
 /**
  * escape string as regex input
- * @param {string} string origin string
- * @returns {string} escaped string
- */
-export function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
-
-/**
- * convert 'AwButton' to 'aw-button'
- * @param {string} name name like 'AwButton'
- * @returns {string} name like 'aw-button'
- */
-export function camelCaseToHyphen(name) {
-    return name.replace(/^./, name[0].toLowerCase()).replace(/([A-Z])/g, (fullMatch, firstMatch) => `-${firstMatch.toLowerCase()}`);
-}
-
-/**
- * convert 'aw-button' to 'AwButton'
- * @param {string} name  name like 'AwButton'
- * @returns {string} name like 'aw-button'
- */
-export function hyphenToCamelCase(name) {
-    return name.replace(/^./, name[0].toUpperCase()).replace(/-(.)/g, (fullMatch, firstMatch) => firstMatch.toUpperCase());
-}
-
-
-/**
- * evaluate string as Javascript expression
- * @param {string} input string as expression
- * @param {Object} params parameters as name value pair
- * @param {boolean} ignoreError if true the error is not thrown
- * @param {boolean} applyObject object will apply to the expr as this
- * @return {*} evaluation result
+ * https://stackoverflow.com/questions/6828637/escape-regexp-strings
  *
- * TODO: match name with function parameters
- * https://stackoverflow.com/questions/1007981/how-to-get-function-parameter-names-values-dynamically
+ * @param str input string
+ * @returns output string with regular expression escaped
  */
-export function evalExpression(input, params, ignoreError = false, applyObject = null) {
-    const names = params ? Object.keys(params) : [];
-    const vals = params ? Object.values(params) : [];
+export const escapeRegExp = (str: string): string => {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+/**
+ * convert string like 'MyButton' to 'my-button'
+ *
+ * @param str input string as 'MyButton'
+ * @returns output string as 'my-button'
+ */
+export const camelCaseToHyphen = (str: string): string => {
+    return str.replace(/^./, str[0].toLowerCase()).replace(/([A-Z])/g, (fullMatch, firstMatch) => `-${firstMatch.toLowerCase()}`);
+}
+
+/**
+ * convert sting like 'my-button' to 'MyButton'
+ *
+ * @param str input string as 'my-button'
+ * @returns output string as 'MyButton'
+ */
+export const hyphenToCamelCase = (str: string): string => {
+    return str.replace(/^./, str[0].toUpperCase()).replace(/-(.)/g, (fullMatch, firstMatch) => firstMatch.toUpperCase());
+}
+
+/**
+ * evaluate expression string as Javascript expression
+ *
+ * @param expr expression string
+ * @param scope evaluation scope as name-value pair
+ * @param ignoreError if true the error is not thrown
+ * @param applyObject object will apply to the expr as this
+ * @returns evaluation result
+ */
+export const evalExpression = (
+    expr: string,
+    scope: ObjectLiteral,
+    ignoreError: boolean = false,
+    applyObject: Object = null
+): any => {
+    const names = scope ? Object.keys(scope) : [];
+    const vals = scope ? Object.values(scope) : [];
     try {
-        let func = new Function(...names, `return ${input};`);
+        let func = new Function(...names, `return ${expr};`);
         return func.apply(applyObject, vals);
     } catch (e) {
         if (!ignoreError) {
-            throw new Error(`evalExpression('${input}') => ${e.message}`);
+            throw new Error(`evalExpression('${expr}') => ${e.message}`);
         } else {
             return undefined;
         }
@@ -75,68 +81,39 @@ export function evalExpression(input, params, ignoreError = false, applyObject =
  * fastest way to copy a pure JSON object, use on your own risk
  * https://stackoverflow.com/questions/122102/what-is-the-most-efficient-way-to-deep-clone-an-object-in-javascript
  *
- * @param {Object} obj Current DOM Element
- * @returns {Object} new cloned object
+ * @param input JSON object as input
+ * @returns JSON object
  */
-export function cloneDeepJsonObject(obj) {
-    return obj ? JSON.parse(JSON.stringify(obj)) : obj;
+export const cloneJson = (input: JSON): JSON => {
+    return input ? JSON.parse(JSON.stringify(input)) : input;
 }
 
 /**
  * Parse view string as DOM without interpret it. Browser version
- * TODO no for now and needs to be enahanced
- * @param {string} str view template as string
- * @returns {Element} DOM Element with all changes
+ *
+ * @param input view template as string
+ * @returns DOM Node as result
  */
-export function parseView(str) {
+export const parseView = (input: string): Node => {
     let parser = new DOMParser();
     let fragement = document.createDocumentFragment();
-    fragement.appendChild(parser.parseFromString(`<div>${str}</div>`, 'text/html').body.firstChild);
+    fragement.appendChild(parser.parseFromString(`<div>${input}</div>`, 'text/html').body.firstChild);
     return fragement.firstChild;
 }
-
 
 /**
  * Bind arguments starting after however many are passed in.
  * https://stackoverflow.com/questions/27699493/javascript-partially-applied-function-how-to-bind-only-the-2nd-parameter
- * @param {function} fn function needs to be bound
- * @param  {...any} bound_args binding args
- * @returns {function} function with partial args
+ *
+ * @param fn function needs to bind with arguments
+ * @param bound_args arguments will be bound at then end of the function interface
+ * @returns new function with bindings
  */
-export function bindTrailingArgs(fn, ...bound_args) {
+export const bindTrailingArgs = (fn: Function, ...bound_args: any): Function => {
     return function (...args) {
         return fn(...args, ...bound_args);
     };
 }
-
-//////////////////////////////////////////////////////////////
-// module loader
-//////////////////////////////////////////////////////////////
-/**
- * default loadModule function
- * @param {string} dep Dependency as string
- */
-let _loadModuleCallback = function (dep) {
-    throw Error('Module Loader is not defined!');
-};
-
-/**
- * Import dependencies
- * @param {string} dep Dependency as string
- * @returns {Promise} promise with dependencies
- */
-export function loadModule(dep) {
-    return _loadModuleCallback(dep);
-}
-
-/**
- * Set loader function for few
- * @param {Function} callback loader function as callback
- */
-export function setLoadModuleFn(callback) {
-    _loadModuleCallback = callback;
-}
-
 
 //////////////////////////////////////////////////////////////
 // data getter / setter
@@ -205,7 +182,7 @@ function parseExpr(str) {
  */
 export function evalDataDefinition(input, scope, level = 0) {
     // Make the method to be immutable at top level
-    let obj = level > 0 ? input : cloneDeepJsonObject(input);
+    let obj = level > 0 ? input : cloneJson(input);
 
     for (let key in obj) {
         let value = obj[key];

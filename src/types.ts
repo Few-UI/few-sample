@@ -8,6 +8,10 @@ export interface Action {
     [key: string]: Function
 }
 
+export interface Dispatcher {
+    (action: any): void
+}
+
 export interface Component {
     data: ObjectLiteral,
     actions: Action,

@@ -4,8 +4,6 @@
 import React from 'react';
 import {
     ComponentDefinition,
-    ObjectLiteral,
-    ViewTemplate
 } from './types';
 
 
@@ -30,15 +28,6 @@ const FirstExample: ComponentDefinition = {
             out: {
                 'data.value': ''
             }
-        }
-    },
-    actions2: {
-        plusOne: (val: number, path: string, data: any, setData: Function) => {
-            const newVal = val + 1;
-            setData({
-                ...data,
-                [path]: newVal
-            });
         }
     }
 };
