@@ -47,15 +47,15 @@ const createAction = (actionDef: any, component: Component) => (): void => {
     // https://stackoverflow.com/questions/37006008/typescript-index-signature-is-missing-in-type
     // - Put component directly has the risk that people can say component.myAttr = newValue.
     // - {...component} stops it
-    let input = evalDataDefinition(actionDef.in, { ...component });
+    let input = evalDataDefinition(actionDef.input, { ...component });
 
     // TODO: match name with function parameters
     // https://stackoverflow.com/questions/1007981/how-to-get-function-parameter-names-values-dynamically
-    let vals = actionDef.in ? Object.values(input) : [];
+    let vals = actionDef.input ? Object.values(input) : [];
 
     let funcRes = actionFunc.apply(actionDef.deps, vals);
 
-    dispatch({ value: processOutputData(actionDef.out, funcRes) });
+    dispatch({ value: processOutputData(actionDef.output, funcRes) });
 }
 
 /**
@@ -90,10 +90,10 @@ export const createComponent: ComponentFactory = componentDef => props => {
     const vm: Component = { data, dispatch, actions: {} };
 
     // actions
-    vm.actions = Object.entries(componentDef.actions).reduce((res, [key, value]) => {
+    vm.actions = Object.entries(componentDef.actions).reduce((res, [key, actionDef]) => {
         return {
             ...res,
-            [key]: createAction(value, vm)
+            [key]: (typeof actionDef === 'function') ? actionDef.bind(null, vm) : createAction(actionDef, vm)
         }
     }, {});
 

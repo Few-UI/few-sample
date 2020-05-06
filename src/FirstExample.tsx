@@ -12,7 +12,8 @@ const FirstExample: ComponentDefinition = {
         <div>
             <h4>Hello {data.name}</h4>
             <div>{data.value}</div>
-            <button onClick={actions.plusOne}>+1</button>
+            <button onClick={actions.plusOne}>+</button>
+            <button onClick={actions.minusOne}>-</button>
         </div>
     ),
     data: () => ({
@@ -21,14 +22,15 @@ const FirstExample: ComponentDefinition = {
     }),
     actions: {
         plusOne: {
-            in: {
+            input: {
                 value: '${data.value}'
             },
             fn: val => val + 1,
-            out: {
+            output: {
                 'data.value': ''
             }
-        }
+        },
+        minusOne: ({ data, dispatch }) => dispatch({ value: { 'data.value': data.value - 1 } })
     }
 };
 
