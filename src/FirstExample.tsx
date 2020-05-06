@@ -4,7 +4,7 @@
 import React from 'react';
 import {
     ComponentDefinition,
-} from './types';
+} from 'few/src/types';
 
 
 const FirstExample: ComponentDefinition = {

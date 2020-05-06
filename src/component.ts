@@ -3,7 +3,7 @@ import {
     ComponentFactory,
     Component,
     DataStore
-} from './types';
+} from 'few/src/types';
 
 import React from 'react';
 
@@ -12,7 +12,7 @@ import {
     getValue,
     evalDataDefinition,
     parseDataPath
-} from './utils';
+} from 'few/src/utils';
 
 /**
  * process output data
@@ -100,3 +100,5 @@ export const createComponent: ComponentFactory = componentDef => props => {
 
     return React.createElement(componentDef.view, vm);
 }
+
+export const testFunc = () => 2;
