@@ -40,6 +40,11 @@ const processOutputData = (output: { [key: string]: string }, result: any): Data
  */
 const createAction = (actionDef: any, component: Component) => (): void => {
 
+    // support function in def
+    if (typeof actionDef === 'function') {
+        return actionDef.call(null, component);
+    }
+
     const { dispatch } = component;
 
     let actionFunc = actionDef.fn;
@@ -87,17 +92,20 @@ export const createComponent: ComponentFactory = componentDef => props => {
         }
     });
 
-    const vm: Component = { data, dispatch, actions: {} };
+    const component: Component = { data, dispatch, actions: {}, view: () => { } };
 
     // actions
-    vm.actions = Object.entries(componentDef.actions).reduce((res, [key, actionDef]) => {
+    component.actions = Object.entries(componentDef.actions).reduce((res, [key, actionDef]) => {
         return {
             ...res,
-            [key]: (typeof actionDef === 'function') ? actionDef.bind(null, vm) : createAction(actionDef, vm)
+            [key]: createAction(actionDef, component)
         }
     }, {});
 
+    // view
+    component.view = componentDef.view;
 
-    return React.createElement(componentDef.view, vm);
+
+    return React.createElement(componentDef.view, component);
 }
 
