@@ -101,4 +101,3 @@ export const createComponent: ComponentFactory = componentDef => props => {
     return React.createElement(componentDef.view, vm);
 }
 
-export const testFunc = () => 2;

@@ -3,7 +3,7 @@ import jsdom from 'jsdom';
 
 import {
     testFunc
-} from '../src/component';
+} from '../src/testFunc';
 
 describe('Test dummy', () => {
     it('Verify testFunc', () => {
