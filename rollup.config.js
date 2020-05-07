@@ -2,7 +2,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import serve from 'rollup-plugin-serve';
-import typescript from 'rollup-plugin-typescript2';
+import typescript from 'rollup-plugin-typescript';
 import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 
