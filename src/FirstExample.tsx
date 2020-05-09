@@ -37,7 +37,7 @@ const FirstExample: ComponentDefinition = {
                 'data.value': ''
             }
         },
-        minusOne: ( { data, dispatch } ): void => dispatch( { value: { 'data.value': data.value - 1 } } )
+        minusOne: ( { data, dispatch } ): void => dispatch( { value: { 'data.value': data.value as number - 1 } } )
     }
 };
 

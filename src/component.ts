@@ -2,7 +2,8 @@ import {
     Dispatcher,
     ComponentFactory,
     Component,
-    DataStore
+    DataStore,
+    ActionDefinition
 } from 'few/src/types';
 
 import React from 'react';
@@ -20,6 +21,7 @@ import {
  * @param result function return value
  * @returns patch object that patch to scope
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const processOutputData = ( output: { [key: string]: string }, result: any ): DataStore => {
     if ( output ) {
         const res = {};
@@ -38,7 +40,7 @@ const processOutputData = ( output: { [key: string]: string }, result: any ): Da
  * @param component component instance
  * @returns fuction callback as action
  */
-const createAction = ( actionDef: any, component: Component ) => (): void => {
+const createAction = ( actionDef: ActionDefinition, component: Component ) => (): void => {
     // support function in def
     if ( typeof actionDef === 'function' ) {
         return actionDef.call( null, component );
@@ -68,8 +70,8 @@ const createAction = ( actionDef: any, component: Component ) => (): void => {
  * @returns one dispatch API
  */
 const composeDispatch = ( dispatchers: { [key: string]: Dispatcher } ): Dispatcher => {
-    return ( action ) => {
-        action.value && dispatchers.data( action.value );
+    return ( action ): void => {
+        action.value && dispatchers.data( action );
     };
 };
 
@@ -78,13 +80,14 @@ const composeDispatch = ( dispatchers: { [key: string]: Dispatcher } ): Dispatch
  * @param componentDef component definition
  * @returns component in specific framework
  */
-export const createComponent: ComponentFactory = componentDef => props => {
+export const createComponent: ComponentFactory = componentDef => (): JSX.Element => {
     const [ data, setData ] = React.useState( () => componentDef.data() );
 
     const dispatch = composeDispatch( {
-        data: ( patch ) => {
+        data: ( action ) => {
+            const patch = action.value;
             Object.entries( patch ).forEach( ( [ key, value ] ) => {
-                const { scope, path } = parseDataPath( key );
+                const { path } = parseDataPath( key );
                 setValue( data, path, value );
                 setData( { ...data } );
             } );
