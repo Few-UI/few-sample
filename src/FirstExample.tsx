@@ -4,13 +4,12 @@
 import React from 'react';
 import {
     Component,
-    ComponentDefinition,
-    ViewTemplate
+    ComponentDefinition
 } from 'few/src/types';
 
 // react/prop-types doesn't allow approach below:
 // const FirstExampleRenderFn : ViewTemplate = ( { data, actions } ) =>
-const FirstExampleRenderFn = ( { data, actions } : Component ) : JSX.Element =>
+const FirstExampleRenderFn = ( { data, actions }: Component ): JSX.Element =>
     <div>
         <h4>Hello {data.name}</h4>
         <div>{data.value}</div>
@@ -38,7 +37,7 @@ const FirstExample: ComponentDefinition = {
                 'data.value': ''
             }
         },
-        minusOne: ( { data, dispatch } ) : void => dispatch( { value: { 'data.value': data.value - 1 } } )
+        minusOne: ( { data, dispatch } ): void => dispatch( { value: { 'data.value': data.value - 1 } } )
     }
 };
 

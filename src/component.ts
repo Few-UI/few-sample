@@ -102,7 +102,7 @@ export const createComponent: ComponentFactory = componentDef => props => {
     }, {} );
 
     // view
-    component.view = componentDef.view;
+    // component.view = componentDef.view;
 
 
     return React.createElement( componentDef.view, component );

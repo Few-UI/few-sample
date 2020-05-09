@@ -1,2 +1,2 @@
 
-export const testFunc = () => 2;
+export const testFunc = (): number => 2;

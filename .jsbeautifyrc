@@ -34,7 +34,7 @@
         "selector_separator_newline": true
     },
     "js": {
-        "allowed_file_extensions": [ "js", "json", "jshintrc", "jsbeautifyrc" ],
+        "allowed_file_extensions": [ "js", "ts", "jsx", "tsx", "json", "jshintrc", "jsbeautifyrc" ],
         "e4x": false,
         "space_in_empty_paren": false
     }
