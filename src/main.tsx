@@ -1,10 +1,9 @@
 /* eslint-env  */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createComponent } from './component';
+import { createComponent } from 'few/src/component';
 
 import FirstExample from './FirstExample';
-
 
 const FirstViewInstance = createComponent( FirstExample );
 
