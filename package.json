@@ -29,7 +29,7 @@
         "eslint-plugin-react": "^7.19.0",
         "jest": "^26.0.1",
         "lodash": "^4.17.15",
-        "lodash-es": "^4.17.15",
+        "lodash-es": "^4.17.23",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
         "rollup": "^2.7.6",
